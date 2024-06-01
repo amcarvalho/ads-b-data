@@ -1,3 +1,4 @@
+import os
 from src.api import APIClient
 from src.db import DatabaseManager
 from src.network_stream import NetworkStreamer
@@ -5,7 +6,7 @@ from src.network_stream import NetworkStreamer
 if __name__ == "__main__":
     ns = NetworkStreamer()
     api = APIClient()
-    dm = DatabaseManager()
+    dm = DatabaseManager(os.environ['ADSB_DB_PASSWORD'])
     while True:
         adsb_data = ns.fetch_data()
         for hex_code in adsb_data:
