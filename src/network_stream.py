@@ -10,13 +10,13 @@ class NetworkStreamer:
         self.lines_to_fetch = config.get('NetworkStreamer', 'lines_to_fetch')
 
 
-    def fetch_data(self, lines_to_fetch: int=100) -> set:
+    def fetch_data(self) -> set:
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.connect((self.host, self.port))
         i = 0
         results = set()
         try:
-            while i < lines_to_fetch:
+            while i < self.lines_to_fetch:
                 data = s.recv(1024)
                 if not data:
                     break
