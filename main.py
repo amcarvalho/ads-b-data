@@ -13,10 +13,11 @@ if __name__ == "__main__":
         for hex_code in adsb_data:
             print(f"Processing hex code: {hex_code}")
             data = api.fetch_data(hex_code)
-            if dm.is_there_a_recent_record(hex_code):
-                print(f"Aircraft with hex code {hex_code} has been observed recently. Not inserting a new record")
-            else:
-                dm.insert_record(data, hex_code)
+            if data is not None:
+                if dm.is_there_a_recent_record(hex_code):
+                    print(f"Aircraft with hex code {hex_code} has been observed recently. Not inserting a new record")
+                else:
+                    dm.insert_record(data, hex_code)
             time.sleep(1)
 
 
