@@ -12,7 +12,7 @@ class DatabaseManager:
             'password': password,
             'host': config.get('Database', 'host'),
         }
-        self.hours_since_last_record = config.get('General', 'hours_since_last_record')
+        self.hours_since_last_record = int(config.get('General', 'hours_since_last_record'))
 
 
     def is_there_a_recent_record(self, hex_code):
