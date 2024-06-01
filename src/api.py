@@ -3,11 +3,11 @@ import json
 from pathlib import Path
 
 class APIClient:
-    def __init__(self, endpoint):
+    def __init__(self, endpoint: str):
         self.endpoint = endpoint
 
-    def fetch_data(self, api_id):
-        response = requests.get(f'{self.endpoint}/{api_id}')
+    def fetch_data(self, hex_code: str):
+        response = requests.get(f'{self.endpoint}/{hex_code}')
         if response.status_code == 200:
             return response.json()
         else:

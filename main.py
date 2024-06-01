@@ -1,12 +1,16 @@
 from src.api import APIClient
 from src.db import DatabaseManager
 from src.network_stream import NetworkStreamer
+import configparser
 
-#api = APIClient('dummy_url')
-#data = api.fetch_test_data()
 
-#dm = DatabaseManager('adsb_data', 'adsb_user', 'adsb_password', '127.0.0.1')
-#dm.insert_record(data, 'test_id')
+# api = APIClient('dummy_url')
+# data = api.fetch_test_data()
+# ns = NetworkStreamer()
 
-ns = NetworkStreamer()
-print(ns.fetch_data())
+
+# dm = DatabaseManager('adsb_password')
+# print(dm.is_there_a_recent_record('test_id2'))
+# dm.insert_record(data, 'test_id2')
+# print(ns.fetch_data())
+# print(ns.fetch_test_data())
