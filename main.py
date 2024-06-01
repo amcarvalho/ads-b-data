@@ -1,4 +1,5 @@
 import os
+import time
 from src.api import APIClient
 from src.db import DatabaseManager
 from src.network_stream import NetworkStreamer
@@ -16,6 +17,7 @@ if __name__ == "__main__":
                 print(f"Aircraft with hex code {hex_code} has been observed recently. Not inserting a new record")
             else:
                 dm.insert_record(data, hex_code)
+            time.sleep(1)
 
 
 # api = APIClient('dummy_url')
