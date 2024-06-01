@@ -1,4 +1,4 @@
-create user adsb_user with password 'adsb_password';
+create user adsb_user with password 'replace_with_adsb_database_password';
 CREATE DATABASE adsb_data;
 GRANT ALL PRIVILEGES ON DATABASE adsb_data TO adsb_user;
 \c adsb_data;

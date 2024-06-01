@@ -1,7 +1,7 @@
 version: '3.8'
 services:
   db:
-    image: postgres
+    image: nervokid/adsbdatadb:latest
     restart: always
     network_mode: "host"
     environment:
@@ -15,7 +15,7 @@ services:
       retries: 5
 
   web:
-    image: nervokid/adsbdata:latest
+    image: nervokid/adsbdatabackend:latest
     command: >
       sh -c "python main.py"
     network_mode: "host"
