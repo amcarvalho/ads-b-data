@@ -3,7 +3,7 @@ import configparser
 from datetime import datetime, timedelta
 
 class DatabaseManager:
-    def __init__(self, password, hours_since_last_record = 1):
+    def __init__(self, password):
         config = configparser.ConfigParser()
         config.read('config.ini')
         self.db_params = {
@@ -13,7 +13,8 @@ class DatabaseManager:
             'host': config.get('Database', 'host'),
         }
         self.hours_since_last_record = config.get('General', 'hours_since_last_record')
-    
+
+
     def is_there_a_recent_record(self, hex_code):
         with psycopg2.connect(**self.db_params) as conn:
             x_hours_ago = datetime.now() - timedelta(self.hours_since_last_record)
@@ -27,6 +28,7 @@ class DatabaseManager:
             cursor.execute(query, (hex_code, x_hours_ago))
             result = cursor.fetchone()[0]
             return result
+
 
     def insert_record(self, data: dict, hex_code: str):
         with psycopg2.connect(**self.db_params) as conn:
