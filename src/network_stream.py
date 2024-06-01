@@ -4,7 +4,7 @@ import configparser
 class NetworkStreamer:
     def __init__(self):
         config = configparser.ConfigParser()
-        config.read(config.ini)
+        config.read('config.ini')
         self.host = config.get('NetworkStreamer', 'adsb_host')
         self.port = config.get('NetworkStreamer', 'adsb_port')
         self.lines_to_fetch = config.get('NetworkStreamer', 'lines_to_fetch')
