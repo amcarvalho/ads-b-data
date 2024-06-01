@@ -7,7 +7,7 @@ class NetworkStreamer:
         config.read('config.ini')
         self.host = config.get('NetworkStreamer', 'adsb_host')
         self.port = int(config.get('NetworkStreamer', 'adsb_port'))
-        self.lines_to_fetch = config.get('NetworkStreamer', 'lines_to_fetch')
+        self.lines_to_fetch = int(config.get('NetworkStreamer', 'lines_to_fetch'))
 
 
     def fetch_data(self) -> set:
