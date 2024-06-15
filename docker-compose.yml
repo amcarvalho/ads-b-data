@@ -1,0 +1,28 @@
+version: '3.8'
+services:
+  db:
+    image: nervokid/adsbdatadb:latest
+    restart: always
+    network_mode: "host"
+    environment:
+      POSTGRES_PASSWORD: replace_with_postgres_password
+    volumes:
+      - ./.postgres_data:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  web:
+    image: nervokid/adsbdatabackend:latest
+    command: >
+      sh -c "python main.py"
+    network_mode: "host"
+    environment:
+      ADSB_DB_PASSWORD: replace_with_adsb_database_password
+    depends_on:
+      db:
+        condition: service_healthy
