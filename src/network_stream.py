@@ -22,9 +22,12 @@ class NetworkStreamer:
                     break
                 csv_line = data.decode('utf-8')
                 csv_list = csv_line.split(',')
-                hex_code = csv_list[4]
-                results.add(hex_code)
-                i = i + 1
+                try:
+                    hex_code = csv_list[4]
+                    results.add(hex_code)
+                    i = i + 1
+                except IndexError:
+                    print("Skipping invalid record ...")
         finally:
             s.close()
 
