@@ -11,11 +11,15 @@ class APIClient:
 
 
     def fetch_data(self, hex_code: str):
-        response = requests.get(f'{self.endpoint}/{hex_code}')
-        if response.status_code == 200:
-            return response.json()
-        else:
-            print(f'API call failed with status code: {response.status_code}')
+        try:
+            response = requests.get(f'{self.endpoint}/{hex_code}')
+            if response.status_code == 200:
+                return response.json()
+            else:
+                print(f'API call failed with status code: {response.status_code}')
+                return None
+        except:
+            print("Failed to fetch data")
             return None
 
     
