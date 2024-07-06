@@ -14,7 +14,8 @@ class APIClient:
         try:
             response = requests.get(f'{self.endpoint}/{hex_code}')
             if response.status_code == 200:
-                return response.json()
+                response_json = response.json()
+                return response_json['response']['aircraft']
             else:
                 print(f'API call failed with status code: {response.status_code}')
                 return None

@@ -34,16 +34,9 @@ class DatabaseManager:
         with psycopg2.connect(**self.db_params) as conn:
             with conn.cursor() as cursor:
                 cursor.execute(
-                    "SELECT * FROM adsb_data.adsb_data WHERE id = %s AND timestamp > %s",
-                    (hex_code, datetime.now() - timedelta(hours=2))
+                    "INSERT INTO adsb_data.adsb_data (icao_type_code, manufacturer, mode_s, operator_flag_code, registered_owners, registration, type, id, timestamp) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)",
+                    (data['icao_type'], data['manufacturer'], data['mode_s'], data['registered_owner_operator_flag_code'], data['registered_owner'], data['registration'], data['type'], hex_code, datetime.now())
                 )
-                if cursor.fetchone() is None:
-                    cursor.execute(
-                        "INSERT INTO adsb_data.adsb_data (icao_type_code, manufacturer, mode_s, operator_flag_code, registered_owners, registration, type, id, timestamp) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)",
-                        (data['ICAOTypeCode'], data['Manufacturer'], data['ModeS'], data['OperatorFlagCode'], data['RegisteredOwners'], data['Registration'], data['Type'], hex_code, datetime.now())
-                    )
-                    conn.commit()
-                    print('Record inserted successfully.')
-                else:
-                    print('Record already exists for this ID within the last 2 hours.')
+                conn.commit()
+                print('Record inserted successfully.')
 
