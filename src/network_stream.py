@@ -1,5 +1,6 @@
 import socket
 import configparser
+import time
 
 class NetworkStreamer:
     def __init__(self):
@@ -12,7 +13,14 @@ class NetworkStreamer:
 
     def fetch_data(self) -> set:
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        s.connect((self.host, self.port))
+        # keep trying to connect until successful
+        while True:
+            try:
+                s.connect((self.host, self.port))
+                break
+            except ConnectionRefusedError:
+                print(f"Connection to {self.host}:{self.port} refused, retrying in 60s...")
+                time.sleep(60)
         i = 0
         results = set()
         try:
