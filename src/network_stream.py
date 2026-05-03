@@ -1,7 +1,11 @@
+import logging
 import socket
 import configparser
 import time
 import requests
+
+logger = logging.getLogger(__name__)
+
 
 class NetworkStreamer:
     def __init__(self):
@@ -65,7 +69,12 @@ class NetworkStreamer:
                 callsign = (entry.get('flight') or '').strip()
                 if hex_code and callsign:
                     callsigns_by_hex[hex_code.upper()] = callsign
+            logger.info(
+                'Feeder aircraft.json: %d entries, %d with hex+flight',
+                len(aircraft),
+                len(callsigns_by_hex),
+            )
             return callsigns_by_hex
         except Exception:
-            print("Failed to fetch callsigns from feeder endpoint")
+            logger.exception('Failed to fetch callsigns from feeder endpoint')
             return {}

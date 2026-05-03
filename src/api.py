@@ -1,8 +1,12 @@
+import logging
 import requests
 import json
 import configparser
 from pathlib import Path
 from typing import Dict, Optional
+
+logger = logging.getLogger(__name__)
+
 
 class APIClient:
     def __init__(self):
@@ -36,25 +40,36 @@ class APIClient:
     def fetch_route_by_callsign(self, callsign: str) -> Dict[str, Optional[str]]:
         if not callsign:
             return self._empty_route_fields()
+        url = f'{self.callsign_route_endpoint}/{callsign}'
         try:
             response = requests.get(
-                f'{self.callsign_route_endpoint}/{callsign}',
+                url,
                 timeout=self.api_timeout_seconds,
             )
             if response.status_code == 404:
+                logger.debug('Callsign route 404 for %r', callsign)
                 return self._empty_route_fields()
             if response.status_code != 200:
-                print(f'Callsign route API call failed with status code: {response.status_code}')
+                retry_after = response.headers.get('Retry-After')
+                snippet = (response.text or '')[:300].replace('\n', ' ')
+                logger.warning(
+                    'Callsign route API %s status=%s retry_after=%r body_prefix=%r',
+                    url,
+                    response.status_code,
+                    retry_after,
+                    snippet,
+                )
                 return self._empty_route_fields()
 
             response_json = response.json()
             flightroute = response_json.get('response', {}).get('flightroute')
             if not flightroute:
+                logger.debug('Callsign route empty flightroute for %r', callsign)
                 return self._empty_route_fields()
 
             origin = flightroute.get('origin') or {}
             destination = flightroute.get('destination') or {}
-            return {
+            out = {
                 'departure_airport_code': origin.get('icao_code') or origin.get('iata_code'),
                 'departure_airport_city': origin.get('municipality'),
                 'departure_airport_country': origin.get('country_name'),
@@ -62,8 +77,10 @@ class APIClient:
                 'arrival_airport_city': destination.get('municipality'),
                 'arrival_airport_country': destination.get('country_name'),
             }
+            logger.debug('Callsign route ok %r dep=%s arr=%s', callsign, out['departure_airport_code'], out['arrival_airport_code'])
+            return out
         except Exception:
-            print('Failed to fetch route by callsign')
+            logger.exception('Failed to fetch route by callsign %r', callsign)
             return self._empty_route_fields()
 
 
