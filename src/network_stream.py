@@ -1,6 +1,7 @@
 import socket
 import configparser
 import time
+import requests
 
 class NetworkStreamer:
     def __init__(self):
@@ -9,6 +10,8 @@ class NetworkStreamer:
         self.host = config.get('NetworkStreamer', 'adsb_host')
         self.port = int(config.get('NetworkStreamer', 'adsb_port'))
         self.lines_to_fetch = int(config.get('NetworkStreamer', 'lines_to_fetch'))
+        self.feeder_aircraft_url = config.get('NetworkStreamer', 'feeder_aircraft_url', fallback='')
+        self.feeder_timeout_seconds = int(config.get('NetworkStreamer', 'feeder_timeout_seconds', fallback='10'))
 
 
     def fetch_data(self) -> set:
@@ -44,3 +47,25 @@ class NetworkStreamer:
     
     def fetch_test_data(self) -> list:
         return list(('780AAB', '4CA24E', '3C65D5'))
+
+
+    def fetch_callsigns_by_hex(self) -> dict:
+        if not self.feeder_aircraft_url:
+            return {}
+        try:
+            response = requests.get(self.feeder_aircraft_url, timeout=self.feeder_timeout_seconds)
+            if response.status_code != 200:
+                print(f"Feeder API call failed with status code: {response.status_code}")
+                return {}
+            payload = response.json()
+            aircraft = payload.get('aircraft', [])
+            callsigns_by_hex = {}
+            for entry in aircraft:
+                hex_code = entry.get('hex')
+                callsign = (entry.get('flight') or '').strip()
+                if hex_code and callsign:
+                    callsigns_by_hex[hex_code.upper()] = callsign
+            return callsigns_by_hex
+        except Exception:
+            print("Failed to fetch callsigns from feeder endpoint")
+            return {}
