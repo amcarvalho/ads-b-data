@@ -19,10 +19,11 @@ services:
   web:
     image: nervokid/adsbdatabackend:latest
     command: >
-      sh -c "python main.py"
+      sh -c "python -u main.py"
     network_mode: "host"
     environment:
       ADSB_DB_PASSWORD: replace_with_adsb_database_password
+      PYTHONUNBUFFERED: "1"
     depends_on:
       db:
         condition: service_healthy
