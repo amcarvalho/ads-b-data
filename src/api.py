@@ -4,6 +4,9 @@ import json
 import configparser
 from pathlib import Path
 from typing import Dict, Optional
+from urllib.parse import quote
+
+from src.adsb_normalize import normalize_callsign
 
 logger = logging.getLogger(__name__)
 
@@ -38,9 +41,11 @@ class APIClient:
 
 
     def fetch_route_by_callsign(self, callsign: str) -> Dict[str, Optional[str]]:
+        callsign = normalize_callsign(callsign or '')
         if not callsign:
             return self._empty_route_fields()
-        url = f'{self.callsign_route_endpoint}/{callsign}'
+        path = quote(callsign, safe='')
+        url = f'{self.callsign_route_endpoint}/{path}'
         try:
             response = requests.get(
                 url,

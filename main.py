@@ -3,6 +3,7 @@ import os
 import time
 import configparser
 
+from src.adsb_normalize import normalize_mode_s_hex
 from src.api import APIClient
 from src.db import DatabaseManager
 from src.network_stream import NetworkStreamer
@@ -42,26 +43,39 @@ if __name__ == "__main__":
         inserted = 0
         inserted_with_route = 0
         for hex_code in adsb_data:
-            print(f"Processing hex code: {hex_code}")
-            data = api.fetch_data(hex_code)
+            hex_key = normalize_mode_s_hex(hex_code)
+            print(f"Processing hex code: {hex_key}")
+            data = api.fetch_data(hex_key)
             if data is not None:
-                if dm.is_there_a_recent_record(hex_code):
+                if dm.is_there_a_recent_record(hex_key):
                     skipped_recent += 1
-                    print(f"Aircraft with hex code {hex_code} has been observed recently. Not inserting a new record")
+                    print(f"Aircraft with hex code {hex_key} has been observed recently. Not inserting a new record")
                 else:
-                    callsign = callsigns_by_hex.get(hex_code.upper())
+                    callsign = callsigns_by_hex.get(hex_key)
                     if callsign:
                         route_data = api.fetch_route_by_callsign(callsign)
                     else:
                         route_data = api.fetch_route_by_callsign('')
-                        logger.debug('No feeder callsign for hex %s', hex_code)
+                        logger.debug('No feeder callsign for hex %s', hex_key)
                     if route_data.get('departure_airport_code') or route_data.get('arrival_airport_code'):
                         inserted_with_route += 1
-                    dm.insert_record(data, hex_code, route_data)
+                    else:
+                        if callsign:
+                            logger.info(
+                                'Insert without route from ADSBDB: hex=%s callsign=%r',
+                                hex_key,
+                                callsign,
+                            )
+                        else:
+                            logger.info(
+                                'Insert without route (no feeder callsign): hex=%s',
+                                hex_key,
+                            )
+                    dm.insert_record(data, hex_key, route_data)
                     inserted += 1
                     logger.debug(
                         'Inserted hex=%s callsign=%r dep=%s arr=%s',
-                        hex_code,
+                        hex_key,
                         callsign,
                         route_data.get('departure_airport_code'),
                         route_data.get('arrival_airport_code'),

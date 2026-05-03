@@ -4,6 +4,8 @@ import configparser
 import time
 import requests
 
+from src.adsb_normalize import normalize_callsign, normalize_mode_s_hex
+
 logger = logging.getLogger(__name__)
 
 
@@ -38,8 +40,10 @@ class NetworkStreamer:
                 csv_line = data.decode('utf-8')
                 csv_list = csv_line.split(',')
                 try:
-                    hex_code = csv_list[4]
-                    results.add(hex_code)
+                    raw_hex = csv_list[4]
+                    hex_code = normalize_mode_s_hex(raw_hex)
+                    if hex_code:
+                        results.add(hex_code)
                     i = i + 1
                 except IndexError:
                     print("Skipping invalid record ...")
@@ -65,10 +69,11 @@ class NetworkStreamer:
             aircraft = payload.get('aircraft', [])
             callsigns_by_hex = {}
             for entry in aircraft:
-                hex_code = entry.get('hex')
-                callsign = (entry.get('flight') or '').strip()
+                hex_code = normalize_mode_s_hex(entry.get('hex') or '')
+                raw_cs = entry.get('flight') or entry.get('callsign') or ''
+                callsign = normalize_callsign(raw_cs)
                 if hex_code and callsign:
-                    callsigns_by_hex[hex_code.upper()] = callsign
+                    callsigns_by_hex[hex_code] = callsign
             logger.info(
                 'Feeder aircraft.json: %d entries, %d with hex+flight',
                 len(aircraft),
