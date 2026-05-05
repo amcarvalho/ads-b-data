@@ -3,7 +3,6 @@ import socket
 import configparser
 import time
 import requests
-
 from src.adsb_normalize import normalize_callsign, normalize_mode_s_hex
 
 logger = logging.getLogger(__name__)

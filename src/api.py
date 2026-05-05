@@ -10,7 +10,6 @@ from src.adsb_normalize import normalize_callsign
 
 logger = logging.getLogger(__name__)
 
-
 class APIClient:
     def __init__(self):
         config = configparser.ConfigParser()
